@@ -1,0 +1,11 @@
+:host {
+  display: contents;
+}
+span {
+  text-align: center;
+  justify-items: center;
+  align-items: center;
+
+  border-style: none;
+  border-width: thin;
+}

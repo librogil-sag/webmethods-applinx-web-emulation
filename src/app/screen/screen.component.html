@@ -1,0 +1,41 @@
+<div
+    [attr.name]="m_screen.name" 
+    [dir]="storageService.getLanguage().screenDirectionRTL ? 'rtl' : 'ltr'" 
+    id="gx_screenArea" 
+    class="wrapper" 
+    *ngIf="m_screen" 
+    [ngStyle]="isChildWindow ? {'grid-template-columns': m_screen ? 'repeat('+m_screen.windows[index].bounds.cols+', 1fr)' : 'repeat(80, 1fr)',
+                'grid-template-rows': m_screen ? 'repeat('+m_screen.windows[index].bounds.rows+', 1fr)' : 'repeat(24, 1fr)',
+                'grid-row-start':  (m_screen.windows[index].bounds.startRow), 'grid-column-start': m_screen.windows[index].bounds.startCol,
+                'grid-row-end': (m_screen.windows[index].bounds.endRow+1), 'grid-column-end': m_screen.windows[index].bounds.endCol+1,
+                'border-style': (m_screen.windows[index].boundsIncludeBorder) ? 'solid' : 'none', 'width': 'max-content !important',
+                'z-index': this.index+1}
+                : {'grid-template-columns': m_screen ? 'repeat('+m_screen.screenSize.columns+', 1fr)' : 'repeat(80, 1fr)',
+                  'grid-template-rows': m_screen ? 'repeat('+(m_screen.screenSize.rows) +', 1fr)' : 'repeat(24, 1fr)',
+                  'z-index': 0, 'width': 'min-content', 'margin-top': '1rem'}">
+
+  <div name="emptyArray" *ngIf="!isChildWindow" style="display: contents; z-index: -999;">
+    <span [ngStyle]="{'grid-row': 1 / 1, 'grid-column-start': 1+i}" *ngFor="let item of screenWidthArray; index as i">&nbsp;</span>
+  </div>
+
+  <div name="windowTitle" 
+      *ngIf="isChildWindow && m_screen.windows[index].title"
+      style="display: flex; margin-top: -0.7rem; background-color: white;"
+      [ngStyle]="titlePosition">
+      <span *ngFor="let ch of m_screen.windows[index].title.split(''); index as i">{{ch != ' ' ? ch : '&nbsp;'}}</span>
+  </div>
+
+  <ng-container #gridContainer  *ngFor="let field of m_screen.fields">
+    <app-field *ngIf="field && (field.protected || (!isChildWindow && hasChildWindows()) || (isChildWindow && !isLastChildWindow))" [field]="field"></app-field>
+    <app-input-field *ngIf="field && !field.protected && (isChildWindow ? isLastChildWindow : !hasChildWindows())" [field]="field"></app-input-field>
+  </ng-container>
+
+  <app-transform-generator *ngIf="m_screen.transformations && (isChildWindow ? isLastChildWindow : !hasChildWindows())" [transformations]="m_screen.transformations"></app-transform-generator>
+
+  <ng-container *ngIf="!isChildWindow">
+    <app-screen *ngFor="let window of getChildWindows(); index as i" [screen]="window" [isChildWindow]="true" [index]="i" [isLastChildWindow]="getChildWindows().length === i+1"></app-screen>
+  </ng-container>
+  
+  <ng-content></ng-content>
+</div>
+

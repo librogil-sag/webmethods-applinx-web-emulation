@@ -1,0 +1,70 @@
+<ng-container *ngIf="storageService.isConnected()">
+
+  <sag-topnav *ngIf="!isSmallScreen()" brandsrc='assets/images/ApplinX-all white.svg' scrollStyle="" brandtitle='ApplinX Web Application' brandheight='56' brandwidth='196'>
+    <sag-topnav-right right>
+      <sag-topnav-item itemType="button" [disable]='false' title="Refresh" (click)="reload()"
+                       itemId="reload" itemName="" itemIcon="dlt-icon-refresh" itemStyle="color:white">
+      </sag-topnav-item>
+      <sag-topnav-item itemType="button" [disable]='false' title="Configuration"
+                       itemId="configuration" itemName="" itemIcon="dlt-icon-settings" itemStyle="color:white">
+      </sag-topnav-item>
+      <sag-topnav-item itemType="button" [disable]='false' title="Send to host"
+                       itemId="sendToHost" itemName="" itemIcon="dlt-icon-send" itemStyle="color:white">
+      </sag-topnav-item>
+      <sag-topnav-item itemType="button" [disable]='false' title="Logoff" (click)="logout()"
+                       itemId="logout" itemName="" itemIcon="dlt-icon-close" itemStyle="color:white">
+      </sag-topnav-item>
+    </sag-topnav-right>
+  </sag-topnav>
+  
+  <div *ngIf="!isSmallScreen()" class="flexContainer" [hidden]="!displayScreen">
+    <div style="align-self: flex-start;">
+      <router-outlet (activate)="onActivate($event)" (deactivate)="onDeactivate()"></router-outlet>
+    </div>
+    <div class="hostKeys" *ngIf="hostKeyTransforms" style="max-width: 13%; margin-left: 5%; right: 0; align-self: center;">
+      <app-host-keys-template [transformations]="hostKeyTransforms">
+      </app-host-keys-template>
+    </div>
+  </div>
+
+  <!-- *************************** For mobile *************************** -->
+  <ng-container *ngIf="isSmallScreen()">
+    <mat-sidenav-container>
+      <mat-sidenav #sidenav mode="side">
+        <sag-topnav-right>
+          <sag-topnav-item itemType="button" [disable]='false' title="Close sidebar" (click)="sidenav.toggle()"
+                           itemIcon="dlt-icon-arrow-left" itemStyle="color:white">
+          </sag-topnav-item>
+          <sag-topnav-item itemType="button" [disable]='false' title="Refresh" (click)="reload()"
+                           itemIcon="dlt-icon-refresh" itemStyle="color:white">
+          </sag-topnav-item>
+          <sag-topnav-item itemType="button" [disable]='false' title="Logoff" (click)="logout()"
+                           itemIcon="dlt-icon-close" itemStyle="color:white">
+          </sag-topnav-item>
+       </sag-topnav-right>
+       <div style="bottom: 5px; position: fixed; width: max(7%, 56px); margin: 0 auto;"><img src="assets/images/ApplinX-all white.svg"></div>
+      </mat-sidenav>
+      <mat-sidenav-content style="position: absolute; width: 100%;">
+        <div>
+          <mat-icon [hidden]="sidenav.opened" (click)="sidenav.toggle()" style="position: fixed;">navigate_next</mat-icon>
+          <div class="flexContainer" [hidden]="!displayScreen">
+            <div style="align-self: flex-start;">
+              <router-outlet (activate)="onActivate($event)" (deactivate)="onDeactivate()"></router-outlet>
+            </div>
+            <div class="hostKeys" *ngIf="hostKeyTransforms" style="max-width: 10%; right: 0; align-self: center;" [ngStyle]="{'margin-left': sidenav.opened ? '1%' : '5%'}">
+              <app-host-keys-template [transformations]="hostKeyTransforms">
+              </app-host-keys-template>
+            </div>
+          </div>
+        </div>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </ng-container>
+</ng-container>
+
+<router-outlet *ngIf="!this.storageService.isConnected()" (activate)="onActivate($event)" (deactivate)="onDeactivate()"></router-outlet>
+
+<div *ngIf="screenLockerService.isShowScreenSpinner()" class="spinner">
+  <mat-spinner diameter="70"></mat-spinner>
+  <span>Loading...</span>
+</div>

@@ -1,0 +1,19 @@
+<ng-container *ngIf="field">
+
+  <input class="move" #inputElement 
+    autocomplete="off"
+    [attr.name]="field.name"
+    [id]="field.name"
+    [ngClass]="[fgClass ? fgClass : '', bgClass ? bgClass : '', this.field.isIntensified ? 'gx_intf' : '']" 
+    *ngIf="!field.protected" 
+    [(ngModel)]="field.content"
+    (input)="onValueChange($event.target.value)"
+    [size]="field.length" 
+    [maxLength]="field.length" 
+    [type]="getDataType(field)"
+    [pattern]="getPattern(field)"
+    [ngStyle]="position"
+    [style]="getCss()"
+    (focus)="onFocus()">
+           
+</ng-container>

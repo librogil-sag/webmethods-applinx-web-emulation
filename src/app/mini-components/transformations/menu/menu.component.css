@@ -1,0 +1,13 @@
+:host {
+  display: contents;
+}
+span {
+  row-gap: 0.1%;
+  text-align: center;
+  justify-items: center;
+  align-items: center;
+
+  text-decoration: underline;
+  border-style: none;
+  border-width: thin;
+}

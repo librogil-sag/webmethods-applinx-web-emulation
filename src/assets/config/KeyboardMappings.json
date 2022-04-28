@@ -1,0 +1,9 @@
+
+{
+    "GXKeyboardMappings":[
+           {"additionalKey":"1", "keyCode":"77", "targetFunction":"go(Hello, I'm a function from the configuration json)"},
+           {"additionalKey":"1", "keyCode":"75", "targetFunction":"void(0)"},
+           {"additionalKey":"0", "keyCode":"114", "targetFunction":"jo(I'm overriding)"}
+    ]
+}
+

@@ -1,0 +1,9 @@
+<ng-container *ngFor="let item of transform.items">
+  <a [routerLink]="" (click)="onClick(item.actionValue)" [ngClass]="transform.style" [ngStyle]="{'grid-row-start': item.actionPosition.row, 'grid-row-end': item.actionPosition.row, 'grid-column-start': item.actionPosition.column, 'grid-column-end': (item.actionPosition.column+item.text.length)}">
+            <span [ngStyle]="{'grid-row-start': item.actionPosition.row, 'grid-row-end': item.actionPosition.row, 'grid-column-start': item.actionPosition.column+i, 'display': 'inline-block'}" *ngFor="let ch of item.text.split(''); index as i">
+              {{ch != ' ' ? ch : '&nbsp;'}}
+            </span>
+  </a>
+</ng-container>
+<app-input-field *ngIf="field && transform.showInputField" [field]="field" (valueChanged)="onInputValueChange($event)"></app-input-field>
+

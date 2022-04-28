@@ -1,0 +1,13 @@
+:host {
+  display: contents;
+}
+input {
+  height: 1.4rem !important;
+  line-height: 1rem !important;
+  font-size: 0.800rem !important;
+}
+@media screen and (max-width: 815px) {
+  input {
+    font-size: 0.600rem !important;
+  }
+}

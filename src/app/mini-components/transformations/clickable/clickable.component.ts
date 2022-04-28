@@ -1,0 +1,29 @@
+import {Component, Input, OnInit} from '@angular/core';
+import { ClickableTransformation, SendKeysEvent, UrlEvent } from '@softwareag/applinx-rest-apis';
+
+import {NavigationService} from '../../../services/navigation/navigation.service';
+
+@Component({
+  selector: 'app-clickable',
+  templateUrl: './clickable.component.html',
+  styleUrls: ['./clickable.component.css']
+})
+export class ClickableComponent implements OnInit {
+
+  @Input() transform: ClickableTransformation;
+
+  constructor(private navigationService: NavigationService) { }
+
+  ngOnInit(): void {
+  }
+
+  onClick(): void {
+    if (this.transform.clickEvent.type === 'SendKeysEvent'){
+      const sendKeysEvent = this.transform.clickEvent as SendKeysEvent;
+      this.navigationService.sendKeys(sendKeysEvent.actionKey);
+    } else if (this.transform.clickEvent.type === 'UrlEvent') {
+      const urlEvent = this.transform.clickEvent as UrlEvent;
+      window.location.href = urlEvent.targetUrl;
+    }
+  }
+}

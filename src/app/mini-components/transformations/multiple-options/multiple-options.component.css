@@ -1,0 +1,13 @@
+:host {
+  display: contents;
+}
+.radioButtons {
+  display: flex;
+  flex-direction: row;
+}
+select {
+  width: max-content;
+}
+app-text {
+  display: contents;
+}

@@ -1,0 +1,33 @@
+{    
+    
+    "ERROR_NO_SCREEN_AREA": "Message for developer: Need to define <div id=gx_screenArea> in order to support label click & double click events",
+	"CSS_ID_MESSAGE": "Message for developer: Must declare id='gx_colorsCss' for the a css include in the current page",
+	"ERROR_SELECT_KEY": "Message for developer: Event not fired , use the onclick event",
+    "ERROR_KEYBOARD_MAPPING_NO_FUNCTION": "For developer: Function doesn't exists. keyCode=",
+	"ERR_INVALID_KEYBOARD_MAPPING": "MESSAGE FOR DEVELOPER !!!\nInvalid keyboard mapping...",
+	"ERR_KEYBOARD_MAPPING_NOT_INITIALIZED": "Keyboard mapping is not initialized , reloading keyboard mapping",
+	"FAILED_TO_SENDKEYS_WITH_REQUEST": "failed to sendkeys with request: ",
+	"SCREENID_MISMATCH_OCCURED_DURING_SENDKEYS_CALL": "screenId mismatch occured during sendKeys call",	
+	"FINISHED_INITIALZING_GENERATED_PAGE": "finished initialzing generated page: ",
+	"INITIALZING_GENERATED_PAGE": "initialzing generated page: ",
+	"INITIALIZING_WEB_APPLICATION": "initializing web application",
+	"SESSION_CONNECTED_SUCCESSFULLY_VIA_OPENID_CONNECT": "Session connected successfully via OpenID-Connect.",
+	"ERROR_WHEN_SENDING_OATH@_CODE_TO_APX_REST_API": "Error when sending oauth2 code to APX REST API.",
+	"LOGGING_OUT": "logging out...",
+	"INITIALZING_LOGIN_PAGE": "initialzing login page...",
+	"GET_SCREEN": "getScreen: ",
+	"KEYBOARDMAPPING": "KeyboardMapping",
+	"EXECUTING_KEYBOARD_MAPPING": "Executing keyboard mapping:",
+	"NO": "No ",
+	"SUCH_FUNCTION_FOR_KEYCODE": "such function for keycode: ",
+	"ADDITIONALKEY": "additionalKey: ",
+	"REDIRECTING_TO_3RD_OPENID_CONNECT_PROVIDER": "Redirecting to 3rd OpenID-Connect provider",
+	"COULDNT_GET_REDIRCT)URI_FROM_REST_API": "couldn't get redirect_uri from REST API.",
+	"LOCING_SCREEN": "Locking screen",
+	"UNLOCING_SCREEN": "Unlocking screen",
+	"SESSION_DISCONNECTED": "session disconnected.",	
+	"FAILED_TO_GET_SCREEN_FROM_REST_API": "failed to get screen from rest-API",
+	"INVALID_MAPPING_SOURCE_UNDIFINED": "Invalid mapping source: undefined"
+
+    
+}

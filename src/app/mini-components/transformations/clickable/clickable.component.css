@@ -1,0 +1,8 @@
+:host {
+    display: contents;
+}
+@media screen and (max-width: 815px) {
+    button {
+        width: max-content !important;
+    }
+}

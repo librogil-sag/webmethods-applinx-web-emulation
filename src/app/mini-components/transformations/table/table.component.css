@@ -1,0 +1,33 @@
+:host {
+  display: contents;
+}
+span {
+  row-gap: 0.1%;
+  text-align: center;
+  justify-items: center;
+  align-items: center;
+
+  border-style: none;
+  border-width: thin;
+}
+input {
+  row-gap: 0.1%;
+  overflow: hidden;
+  margin-left: 3px;
+  border-width: 1px;
+}
+.tableHeader {
+  text-align: center;
+  justify-items: center;
+  align-items: center;
+}
+th {
+  border-style: solid;
+  border-width: thin;
+}
+table {
+  /* width: max-content !important; */
+  height: 1rem !important;
+  line-height: 1rem !important;
+}
+

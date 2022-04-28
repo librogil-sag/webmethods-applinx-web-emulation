@@ -1,0 +1,24 @@
+:host {
+  display: contents;
+}
+span {
+  text-align: center;
+  justify-items: center;
+  align-items: center;
+  /* width: min-content;    */
+}
+.flexField{
+  display: flex;
+  flex-direction: row;
+
+  border-style: none;
+  border-width: thin;
+}
+.blink_me {
+  animation: blinker 1s linear infinite;
+}
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
