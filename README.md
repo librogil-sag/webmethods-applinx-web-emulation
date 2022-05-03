@@ -75,8 +75,8 @@ The Web Application contains a configuration file under following path:
 *_Required_.
 
 | Name        | Description  |
-| ------------- |:-------------:|
-| __*__ applicationName | The name of the application that the session will be connected to. |
+| ------------- |:-------------|
+| *applicationName | The name of the application that the session will be connected to. |
 | connectionPool   | Connection Pool enable to immediately get a host connection that is ready in a specific screen. |
 | logger           | see logger table below |
 | sessionOptions   | Controlling the Connection Properties. ApplinX allows passing various connection parameters from the code in order to control the configuration of the application. For example: Controlling from the code if the application will work against a trace file. |
@@ -84,7 +84,7 @@ The Web Application contains a configuration file under following path:
 ### Logger
 
 | Name        | Description  |
-| ------------- |:-------------:|
+| ------------- |:-------------|
 | level (number) | only log messages of this level or higher (OFF disables the logger for the client). |
 | serverLogLevel (number) | only send log messages of this level or higher to the server (OFF disables the logger for the server). |
 | disableConsoleLogging (Boolean) | disables console logging, while still alerting the log monitor. |
