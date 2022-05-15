@@ -89,4 +89,26 @@ export abstract class AbstractUserExits implements IUserExits {
     protected addKeyboardMapping(additionalKey: string, keyCode: string, functionElement: any, overrideExisting: boolean, cancelMapFunction?: any) {
         this.keyboardMappingService.addKeyboardMapping(additionalKey, keyCode, functionElement, overrideExisting, cancelMapFunction);
     }
+
+
+    getInfoService():InfoService {
+        return this.infoService;
+    }
+
+    getNavigationService (): NavigationService{
+        return this.navigationService;
+    }
+
+    getStorageService ():StorageService {
+        return this.storageService;
+    }
+
+    getKeyboardMappingService ():KeyboardMappingService{
+        return this.keyboardMappingService;
+    }
+
+    getLogger ():NGXLogger {
+        return this.logger;
+    }
+   
 }
