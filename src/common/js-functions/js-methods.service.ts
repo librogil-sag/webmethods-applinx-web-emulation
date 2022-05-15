@@ -27,11 +27,5 @@ export class JSMethodsService implements IJSFunctionService {
     constructor() {
     }
     
-    go(str: string):void{
-        alert(str);
-    }
-
-    jo(str: string):void{
-        console.debug(str);
-    }
+  
 }

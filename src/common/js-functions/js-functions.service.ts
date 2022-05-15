@@ -25,7 +25,4 @@ export class JSFunctionsService implements IJSFunctionService {
     constructor() {
     }
 
-    go():void{
-        console.debug("boo");
-    }
 }
