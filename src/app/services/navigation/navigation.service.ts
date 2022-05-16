@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */ 
- 
-import {Injectable} from '@angular/core';
+ import {Injectable} from '@angular/core';
 import { GXUtils } from 'src/utils/GXUtils'
 import {BehaviorSubject, Observable} from 'rxjs';
 import { ScreenLockerService } from '../screen-locker.service';
@@ -41,6 +40,7 @@ export class NavigationService {
   private sendableFields: Map<string, InputField>;
   private cursorPosition: Cursor;
   CHECK_HOST_SCREEN_UPDATE_INTERVAL:number = 5000;
+  CHECK_HOST_SCREEN_UPDATE_TIMEOUT:number = 500;
   isScreenUpdated: BehaviorSubject<boolean> = new BehaviorSubject(false);
   screenObjectUpdated: BehaviorSubject<GetScreenResponse> = new BehaviorSubject(null);
 
@@ -59,20 +59,25 @@ export class NavigationService {
 
   checkHostScreenUpdate (): void {
     setInterval( () => { 
-        const req = new GetScreenRequest();                           
-        if (this.getScreenId()){
-          this.getHostScreenNumber().subscribe (
-            screenNumberResponse => {
-              if (screenNumberResponse.screenNumber >  this.getScreenId() ) {      
-                this.isScreenUpdated.next(true);            
-            }
-            (error: HttpErrorResponse) => {
-              this.logger.error(this.messages.get("FAILED_TO_GET_SCREEN_FROM_REST_API"));
-              this.userExitsEventThrower.fireOnGetScreenError(error);
-            }
-            });
-        }
+      this.checkScreenUpdated();
+       
    }, this.CHECK_HOST_SCREEN_UPDATE_INTERVAL);
+  }
+
+  checkScreenUpdated () {
+    const req = new GetScreenRequest();                           
+    if (this.getScreenId()){
+      this.getHostScreenNumber().subscribe (
+        screenNumberResponse => {
+          if (screenNumberResponse.screenNumber >  this.getScreenId() ) {      
+            this.isScreenUpdated.next(true);                      
+          }
+        },
+        (error: HttpErrorResponse) => {
+          this.logger.error(this.messages.get("FAILED_TO_GET_SCREEN_FROM_REST_API"));
+          this.userExitsEventThrower.fireOnGetScreenError(error);
+        });
+    }
   }
 
 
@@ -97,6 +102,13 @@ export class NavigationService {
     );
   }
 
+  checkForIntermidateScreen() {
+    setTimeout( () => { 
+      this.checkScreenUpdated();
+       
+     }, this.CHECK_HOST_SCREEN_UPDATE_TIMEOUT);
+  }
+
   sendKeysInternal (sendKey: string): void {
     this.screenLockerService.setScreenIdUpdated(false);
     this.screenLockerService.setLocked(true);
@@ -108,6 +120,8 @@ export class NavigationService {
       this.tearDown();      
       this.userExitsEventThrower.firePostSendKey(newScreen);
       this.screenObjectUpdated.next (newScreen);      
+      this.checkForIntermidateScreen();
+      
     }, errorResponse => {
       this.logger.error(errorResponse);
       if (errorResponse.status === StatusCodes.GONE || errorResponse.error.message.indexOf("Session was disconnected by Host") > 0) {
