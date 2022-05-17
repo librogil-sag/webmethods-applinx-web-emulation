@@ -15,6 +15,7 @@
  */ 
 import { HttpErrorResponse } from '@angular/common/http';
 import { CreateSessionResponse, CreateSessionRequest, GetScreenRequest, SendKeysRequest, GetScreenResponse } from '@softwareag/applinx-rest-apis';
+//import { GXAdditionalKey, GXKeyCodes } from '../services/enum.service';
 import { AbstractUserExits } from './AbstractUserExits';
 
 export class LifecycleUserExits extends AbstractUserExits {
@@ -62,9 +63,9 @@ export class LifecycleUserExits extends AbstractUserExits {
     afterViewInit() {
         super.afterViewInit();
         // Set content to unprotected field.     
-        // this.navigationService.fillInput('<id>', '<value>');
+        //this.getNavigationService().fillInput('<id>', '<value>');
 
         // Add KeyboardMapping.
-        // this.addKeyboardMapping(GXAdditionalKey.NONE, GXKeyCodes.F4, () => alert(`Hello world`), true);
+         //this.addKeyboardMapping(GXAdditionalKey.NONE, GXKeyCodes.F4, () => alert(`Hello world`), true);
     }
 }
