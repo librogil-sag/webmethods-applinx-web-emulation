@@ -52,7 +52,7 @@ export class StorageService {
     this.logger.debug(this.messages.get("SESSION_DISCONNECTED"));
     sessionStorage.removeItem('gx_token');
     this.screenHolderService.setRuntimeScreen(null);
-    this.router.navigate(['login']);
+    this.router.navigate(['webLogin']);
   }
   getAuthToken(): string {
     return 'Bearer ' + sessionStorage.getItem('gx_token');

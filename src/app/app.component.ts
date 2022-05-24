@@ -16,7 +16,7 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import {NavigationService} from './services/navigation/navigation.service';
 import {StorageService} from './services/storage.service';
-import {LoginComponent} from './login/login.component';
+import {WebLoginComponent} from './webLogin/webLogin.component';
 import { GridPosition, TabAndArrowsService } from './services/navigation/tab-and-arrows.service';
 import { ScreenLockerService } from './services/screen-locker.service';
 import { KeyboardMappingService } from './services/keyboard-mapping.service';
@@ -45,7 +45,7 @@ export class AppComponent implements OnInit, OnDestroy {
   readonly title = 'ApplinX-Framework';
 
   hostKeyTransforms: HostKeyTransformation[];
-  loginComponent: LoginComponent;
+  loginComponent: WebLoginComponent;
   displayScreen = false;
   
   disconnectSubscription: Subscription;
@@ -165,7 +165,7 @@ export class AppComponent implements OnInit, OnDestroy {
     if (component instanceof ScreenComponent) {
       this.userExitsEventThrower.clearEventListeners();
       this.userExitsEventThrower.addEventListener(new LifecycleUserExits(this.infoService,this.navigationService,this.storageService,this.keyboardMappingService,this.logger));
-    } else if (component instanceof LoginComponent) {
+    } else if (component instanceof WebLoginComponent) {
       this.loginComponent = component;
     }
   }

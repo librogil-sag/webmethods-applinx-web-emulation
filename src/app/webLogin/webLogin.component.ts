@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */ 
+ 
 import {Component, OnInit} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
 import {StorageService} from '../services/storage.service';
@@ -31,10 +32,10 @@ declare var $: any;
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  templateUrl: './webLogin.component.html',
+  styleUrls: ['./webLogin.component.css']
 })
-export class LoginComponent implements OnInit {
+export class WebLoginComponent implements OnInit {
 
   form: FormGroup;
   authMethod: string;
