@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */ 
+ 
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
@@ -51,7 +52,7 @@ export class RouteGuardService implements CanActivate {
     if (isLoggedIn && (url === 'instant' || url === screenName)) {
       return true;
     } else if (idPcode) {
-      if (url === 'login') {
+      if (url === 'webLogin') {
         this.router.navigate(['instant', { queryParams: route.queryParams }]);
         return true;
       }
@@ -74,10 +75,10 @@ export class RouteGuardService implements CanActivate {
           );
         })
       )
-    } else if (url === 'login' && !idPcode) {
+    } else if (url === 'webLogin' && !idPcode) {
       return true;
     } else {
-      this.router.navigate(['login']);
+      this.router.navigate(['webLogin']);
       return false; 
     }
   }

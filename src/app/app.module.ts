@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */ 
+ 
 import { BrowserModule } from '@angular/platform-browser';
 import { Injector, NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
@@ -25,7 +26,7 @@ import { AppComponent } from './app.component';
 import { ApiModule, Configuration, ConfigurationParameters} from '@softwareag/applinx-rest-apis'
 import { ScreenComponent } from './screen/screen.component';
 import { FormsModule, ReactiveFormsModule} from '@angular/forms';
-import { LoginComponent } from './login/login.component';
+import { WebLoginComponent } from './webLogin/webLogin.component';
 import { TopnavModule } from '@softwareag/dln';
 import { environment} from '../environments/environment';
 import { FieldComponent } from './mini-components/field/field.component';
@@ -69,7 +70,7 @@ export const generatedPages: any[] = [
 ];
 
 const routes: Routes = [
-  { path: 'login', component: LoginComponent, canActivate: [RouteGuardService] },
+  { path: 'webLogin', component: WebLoginComponent, canActivate: [RouteGuardService] },
   { path: 'instant', component: ScreenComponent, canActivate: [RouteGuardService] },
   { path: '**',   redirectTo: 'instant', pathMatch: 'full' }
 ]; 
@@ -78,7 +79,7 @@ const routes: Routes = [
   declarations: [
     AppComponent,
     ScreenComponent,
-    LoginComponent,
+    WebLoginComponent,
     FieldComponent,
     ClickableComponent,
     TableComponent,

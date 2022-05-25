@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */ 
+ 
 import { Injectable, NgZone } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { MessagesService } from './messages.service';
@@ -62,7 +63,7 @@ export class ScreenLockerService {
   setLocked(lock: boolean): void {    
     if (lock) {
       this.showTabSpinner();
-      this.screenSpinnerHandler = setTimeout(() => this.showScreenSpinner = true, 1000);
+      this.screenSpinnerHandler = setTimeout(() => this.showScreenSpinner = true, 50);
     } else {
       if (this.showScreenSpinner) {
         setTimeout(() => this.showScreenSpinner = false); // 1000ms have already passed and spinner is presented.
