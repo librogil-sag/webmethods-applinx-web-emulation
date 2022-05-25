@@ -16,7 +16,7 @@
  
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LoginComponent } from './webLoginPage.component';
+import { WebLoginComponent } from './webLogin.component';
 import { ApiModule,SessionService } from '@softwareag/applinx-rest-apis';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
@@ -29,12 +29,12 @@ import { IJSFunctionService } from 'src/common/js-functions/ijs-functions.servic
 import { JSFunctionsService } from 'src/common/js-functions/js-functions.service'
 			
 describe('LoginComponent', () => {
-  let component: LoginComponent;
-  let fixture: ComponentFixture<LoginComponent>;
+  let component: WebLoginComponent;
+  let fixture: ComponentFixture<WebLoginComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ LoginComponent ],
+      declarations: [ WebLoginComponent ],
       imports: [
         HttpClientModule,
 		RouterTestingModule,
@@ -54,7 +54,7 @@ describe('LoginComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LoginComponent);
+    fixture = TestBed.createComponent(WebLoginComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
