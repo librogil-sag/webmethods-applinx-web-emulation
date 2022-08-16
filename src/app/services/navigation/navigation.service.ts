@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */ 
- import {Injectable} from '@angular/core';
+
+import {Injectable} from '@angular/core';
 import { GXUtils } from 'src/utils/GXUtils'
 import {BehaviorSubject, Observable} from 'rxjs';
 import { ScreenLockerService } from '../screen-locker.service';
@@ -33,7 +34,6 @@ import { GetScreenNumberResponse } from '@softwareag/applinx-rest-apis/lib/model
 })
 export class NavigationService {
  
-  
   private routingHandler: RoutingHandler;
   private screenId: number;
   private screenSize: Size;
@@ -41,9 +41,10 @@ export class NavigationService {
   private cursorPosition: Cursor;
   CHECK_HOST_SCREEN_UPDATE_INTERVAL:number = 5000;
   CHECK_HOST_SCREEN_UPDATE_TIMEOUT:number = 500;
+  isConnectedtoHost: BehaviorSubject<boolean> = new BehaviorSubject(true);
   isScreenUpdated: BehaviorSubject<boolean> = new BehaviorSubject(false);
   screenObjectUpdated: BehaviorSubject<GetScreenResponse> = new BehaviorSubject(null);
-
+  private isThereError: boolean = false;
   constructor(private screenService: ScreenService, 
               private screenLockerService: ScreenLockerService, private router: Router,
               private infoService: InfoService, 
@@ -60,11 +61,14 @@ export class NavigationService {
   checkHostScreenUpdate (): void {
     setInterval( () => { 
       this.checkScreenUpdated();
-       
    }, this.CHECK_HOST_SCREEN_UPDATE_INTERVAL);
   }
 
   checkScreenUpdated () {
+    if (this.isThereError) {
+      return;
+    } 
+
     const req = new GetScreenRequest();                           
     if (this.getScreenId()){
       this.getHostScreenNumber().subscribe (
@@ -76,10 +80,11 @@ export class NavigationService {
         (error: HttpErrorResponse) => {
           this.logger.error(this.messages.get("FAILED_TO_GET_SCREEN_FROM_REST_API"));
           this.userExitsEventThrower.fireOnGetScreenError(error);
+          this.isConnectedtoHost.next(false);
+          this.isThereError = true;
         });
     }
   }
-
 
   getHostScreenNumber (): Observable<GetScreenNumberResponse>{         
     return this.screenService.getScreenNumber(this.storageService.getAuthToken());    
@@ -105,7 +110,6 @@ export class NavigationService {
   checkForIntermidateScreen() {
     setTimeout( () => { 
       this.checkScreenUpdated();
-       
      }, this.CHECK_HOST_SCREEN_UPDATE_TIMEOUT);
   }
 
@@ -151,7 +155,11 @@ export class NavigationService {
   public getScreenId(): number {
     return this.screenId;
   }
-  
+
+  isThereErrorSetter(status: boolean): void {
+    this.isThereError = status;
+  }
+
   setScreenId(id: number): void {
     this.screenId = id;
     this.screenLockerService.setScreenIdUpdated(true);
@@ -209,6 +217,7 @@ export class NavigationService {
       }
     });
   }
+
   tearDown(): void {
     this.sendableFields.clear();
     this.tabAndArrowsService.tearDown();

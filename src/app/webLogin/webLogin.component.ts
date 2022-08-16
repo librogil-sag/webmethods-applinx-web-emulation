@@ -28,6 +28,8 @@ import { CreateSessionResponse,GetInfoResponse,
 import { UserExitsEventThrowerService } from '../services/user-exits-event-thrower.service';
 import { NGXLogger } from 'ngx-logger';
 import { MessagesService } from '../services/messages.service';
+import { NavigationService } from '../services/navigation/navigation.service';
+import { Subscription } from 'rxjs';
 declare var $: any;
 
 @Component({
@@ -39,11 +41,14 @@ export class WebLoginComponent implements OnInit {
 
   form: FormGroup;
   authMethod: string;
+  webLoginVisible: boolean = false;
   errorMessage: string;
   version: string;
+  autoLoginSubscription: Subscription;
 
   constructor(private sessionService: SessionService, private infoService: InfoService, 
     private storageService: StorageService, private keyboardMappingService: KeyboardMappingService,
+    private navigationService: NavigationService,
     private screenLockerService: ScreenLockerService, private userExitsEventThrower: UserExitsEventThrowerService,
     private configurationService: ConfigurationService, private oAuth2handler: OAuth2HandlerService, private logger: NGXLogger, private messages: MessagesService) {}
 
@@ -57,7 +62,6 @@ export class WebLoginComponent implements OnInit {
       password: new FormControl(''),
       newPassword: new FormControl(''),
     });
-
     this.infoService.getInfo().subscribe((response: GetInfoResponse) => {
       const authProviders: string[] = [GXConst.APPLINX, GXConst.LDAP, GXConst.OPEN_ID_CONNECT, GXConst.NATURAL, GXConst.DISABLED];
       if (!authProviders.includes(response.auth)) {
@@ -66,9 +70,42 @@ export class WebLoginComponent implements OnInit {
       } else {
         this.authMethod = response.auth;
       }
+      this.autoLoginSubscription = this.configurationService.isConfigurationLoaded.subscribe(loaded => {
+        if (!loaded) {
+          return;
+        }
+        if (loaded) {
+          if (this.configurationService.autoLogin && this.authMethod == GXConst.DISABLED) {
+            this.autoLogin();
+          }
+          else {
+            this.webLoginVisible = true;
+          }
+        }
+      })
       this.version = response.version;
       this.keyboardMappingService.initMapping(response.keyboardMapping);       
       this.screenLockerService.setLocked(false); // Unlock screen after finished initizling. 
+    });
+  }
+
+  autoLogin() {
+    const createSessionRequest = new CreateSessionRequest(this.configurationService.applicationName, 
+      this.configurationService.connectionPool);
+    this.sessionConnect(createSessionRequest);
+  }
+
+  sessionConnect(createSessionRequest: CreateSessionRequest, authHeader?: string) {
+    this.userExitsEventThrower.firePreConnect(createSessionRequest, authHeader);
+    this.sessionService.connect(createSessionRequest, authHeader).subscribe((res: CreateSessionResponse)  => {
+      this.storageService.setConnected(res.token);
+      this.navigationService.isConnectedtoHost.next(true);
+      this.navigationService.isThereErrorSetter(false);
+      this.keyboardMappingService.initMapping(res.keyboardMapping);
+      this.userExitsEventThrower.firePostConnect(res); 
+    }, (errorResponse: HttpErrorResponse) => {
+      this.handleError(errorResponse);
+      this.userExitsEventThrower.fireOnConnectError(errorResponse);
     });
   }
 
@@ -80,7 +117,6 @@ export class WebLoginComponent implements OnInit {
       return;
     }
     this.screenLockerService.setLocked(true);  
-
     if (this.authMethod === GXConst.OPEN_ID_CONNECT) {
       this.oAuth2handler.redirectToIDPLoginPage();
     } else {
@@ -96,9 +132,8 @@ export class WebLoginComponent implements OnInit {
     if (!this.username.value && this.authMethod !== GXConst.DISABLED) {
       return;
     }
-
-    const conf = this.configurationService;
-    const createSessionRequest = new CreateSessionRequest(conf.applicationName, conf.connectionPool);
+    const createSessionRequest = new CreateSessionRequest(this.configurationService.applicationName, 
+      this.configurationService.connectionPool);
     if (this.configurationService.sessionOptions) {
       createSessionRequest.options = Object.assign(createSessionRequest.options, this.configurationService.sessionOptions);
     }
@@ -111,16 +146,7 @@ export class WebLoginComponent implements OnInit {
     } else if (this.authMethod === GXConst.APPLINX || this.authMethod === GXConst.LDAP) {
       authHeader = 'Basic ' + btoa(unescape(encodeURIComponent(this.username.value + ':' + this.password.value)));
     }
-    
-    this.userExitsEventThrower.firePreConnect(createSessionRequest, authHeader);
-    this.sessionService.connect(createSessionRequest, authHeader).subscribe((res: CreateSessionResponse)  => {
-      this.storageService.setConnected(res.token);
-      this.keyboardMappingService.initMapping(res.keyboardMapping);
-      this.userExitsEventThrower.firePostConnect(res); 
-    }, (errorResponse: HttpErrorResponse) => {
-      this.handleError(errorResponse);
-      this.userExitsEventThrower.fireOnConnectError(errorResponse);
-    });
+    this.sessionConnect(createSessionRequest, authHeader);
   }
 
   handleError(errorResponse: HttpErrorResponse): void {

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */ 
+
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import {NavigationService} from './services/navigation/navigation.service';
 import {StorageService} from './services/storage.service';
@@ -32,7 +33,6 @@ import { OAuth2HandlerService } from './services/oauth2-handler.service';
 import { MessagesService } from './services/messages.service';
 import { HostKeyTransformation, Cursor, SessionService ,InfoService} from '@softwareag/applinx-rest-apis';
 
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -51,6 +51,7 @@ export class AppComponent implements OnInit, OnDestroy {
   disconnectSubscription: Subscription;
   hostKeysEmitterSubscription: Subscription;
   screenInitializedSubscription: Subscription;
+  hostConnectionSubscription: Subscription;
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
@@ -97,17 +98,16 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(private sessionService: SessionService, private navigationService: NavigationService,
     public storageService: StorageService, private tabAndArrowsService: TabAndArrowsService,
     private keyboardMappingService: KeyboardMappingService, public screenLockerService: ScreenLockerService,
-    private screenHolderService: ScreenHolderService, private userExitsEventThrower: UserExitsEventThrowerService,
+    protected screenHolderService: ScreenHolderService, private userExitsEventThrower: UserExitsEventThrowerService,
     private logger: NGXLogger, private httpClient: HttpClient, private messages: MessagesService,
     private oAuth2handler: OAuth2HandlerService,
-	private infoService: InfoService) {
+	  private infoService: InfoService) {
     this.userExitsEventThrower.clearEventListeners();
     this.userExitsEventThrower.addEventListener(new LifecycleUserExits(infoService,navigationService,storageService,keyboardMappingService,logger));
     this.getLoggerConfiguration();
   }
-  
-            
-	getLoggerConfiguration() {   
+
+  getLoggerConfiguration() {   
     const jsonDefault: LoggerConfig = this.logger.getConfigSnapshot();
     this.httpClient.get<LoggerConfig>('./assets/config/sessionConfig.json').subscribe(data => {
       let json = data[AppComponent.LOGGER_ELEMENT];         
@@ -132,8 +132,23 @@ export class AppComponent implements OnInit, OnDestroy {
         });
       }
     });
+    this.hostConnectionSubscription = this.navigationService.isConnectedtoHost.subscribe(hostConnection => {
+      if (!hostConnection)
+      this.showDisconnectionMessage();
+    })
   }
 
+  showDisconnectionMessage(): void {
+    const targetModal = document.getElementById('readonly_modal');
+    targetModal.classList.add('dlt-modal-window__open');
+  }
+
+  reconnect(): void {
+    const targetModal = document.getElementById('readonly_modal');
+    targetModal.classList.remove('dlt-modal-window__open')
+    this.storageService.setNotConnected();
+  }
+  
   reload(): void {
     this.navigationService.isScreenUpdated.next(true);
   }
@@ -187,6 +202,9 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     if (this.screenInitializedSubscription) {
       this.screenInitializedSubscription.unsubscribe();
+    }
+    if (this.hostConnectionSubscription) {
+      this.hostConnectionSubscription.unsubscribe();
     }
   }
 }
