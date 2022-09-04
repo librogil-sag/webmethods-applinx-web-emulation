@@ -41,7 +41,7 @@ export class WebLoginComponent implements OnInit {
 
   form: FormGroup;
   authMethod: string;
-  webLoginVisible: boolean = false;
+  webLoginVisible: boolean = true;
   errorMessage: string;
   version: string;
   autoLoginSubscription: Subscription;

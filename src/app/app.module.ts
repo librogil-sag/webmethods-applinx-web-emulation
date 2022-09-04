@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */ 
- 
+
+import { CommonModule } from '@angular/common';  
 import { BrowserModule } from '@angular/platform-browser';
 import { Injector, NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
@@ -21,7 +22,6 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule} from '@angular/material/icon';
 import { MatFormFieldModule} from '@angular/material/form-field';
 import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-
 import { AppComponent } from './app.component';
 import { ApiModule, Configuration, ConfigurationParameters} from '@softwareag/applinx-rest-apis'
 import { ScreenComponent } from './screen/screen.component';
@@ -56,6 +56,9 @@ import { ScreenHolderService } from './services/screen-holder.service';
 import { OAuth2HandlerService } from './services/oauth2-handler.service';
 import { RouteGuardService } from './services/route-guard.service';
 import { ScreenProcessorService } from './services/screen-processor.service'
+import { MatDatepickerModule} from '@angular/material/datepicker';
+import { MatInputModule} from '@angular/material/input';
+import { MatNativeDateModule } from '@angular/material/core';
 
 export function apiConfigFactory(): Configuration {
   const params: ConfigurationParameters = {
@@ -63,23 +66,24 @@ export function apiConfigFactory(): Configuration {
     withCredentials: false,
   };
   return new Configuration(params);
-}
-
+} 
 export const generatedPages: any[] = [
-  
 ];
 
 const routes: Routes = [
+  
   { path: 'webLogin', component: WebLoginComponent, canActivate: [RouteGuardService] },
   { path: 'instant', component: ScreenComponent, canActivate: [RouteGuardService] },
   { path: '**',   redirectTo: 'instant', pathMatch: 'full' }
+  
 ]; 
 
 @NgModule({
   declarations: [
-    AppComponent,
-    ScreenComponent,
     WebLoginComponent,
+    AppComponent,
+    CalendarComponent,
+    ScreenComponent,
     FieldComponent,
     ClickableComponent,
     TableComponent,
@@ -89,7 +93,6 @@ const routes: Routes = [
     TransformGeneratorComponent,
     InputFieldComponent,
     HostKeysTemplateComponent,
-    CalendarComponent,
     LineComponent,
     CheckboxComponent,
   ].concat(generatedPages),
@@ -97,11 +100,15 @@ const routes: Routes = [
     ApiModule.forRoot(apiConfigFactory),
     RouterModule.forRoot(routes, {onSameUrlNavigation: 'reload'}),
     BrowserModule,
+    CommonModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
     TopnavModule,
+    MatDatepickerModule,
+    MatInputModule,
     MatFormFieldModule,
+    MatNativeDateModule,
     BrowserAnimationsModule,
     MatIconModule,
     MatSidenavModule,    
@@ -121,11 +128,15 @@ const routes: Routes = [
     OAuth2HandlerService,
     RouteGuardService,
     ScreenProcessorService,
+    BrowserModule, 
+    FormsModule, 
     {provide: 'IJSFunctionService', useClass: JSMethodsService}
   ],  
-  exports: [RouterModule],
+  exports: [RouterModule, 
+  ],
   bootstrap: [AppComponent]
 })
+
 export class AppModule {
   constructor(private injector: Injector) {
     StorageService.injector = this.injector;
