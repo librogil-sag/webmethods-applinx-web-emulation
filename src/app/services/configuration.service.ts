@@ -16,6 +16,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
+import { BehaviorSubject } from 'rxjs';
 import { GXUtils } from 'src/utils/GXUtils';
 import { NavigationService } from './navigation/navigation.service';
 
@@ -27,6 +28,8 @@ export class ConfigurationService {
   private _applicationName: string;
   private _connectionPool: string;
   private _sessionOptions: { [key: string]: string; };
+  private _autoLogin: boolean;
+  isConfigurationLoaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
   
   constructor(private httpClient: HttpClient, private logger: NGXLogger, private navigationService: NavigationService) { 
     this.loadConfig();
@@ -38,7 +41,10 @@ export class ConfigurationService {
         config => {
           this._applicationName = config.applicationName;
           this._connectionPool = config.connectionPool;
+          this._autoLogin = config.autoLoginIfDisabledAuth;
           this.initSessionOptions(config.sessionOptions);
+          this.navigationService.setIsAutoLogin(this._autoLogin);
+          this.isConfigurationLoaded.next(true);
         },
         error => {
           this.logger.error(error);
@@ -77,11 +83,19 @@ export class ConfigurationService {
   get applicationName(): string {
     return this._applicationName;
   }
+  get autoLogin(): boolean {
+    return this._autoLogin;
+  }
   get connectionPool(): string {
     return this._connectionPool;
   }
   get sessionOptions(): any {
     return this._sessionOptions;
   }
-  
+
+  ngOnDestroy(): void {
+    if (this.isConfigurationLoaded) {
+      this.isConfigurationLoaded.unsubscribe();
+    }
+  }
 }
