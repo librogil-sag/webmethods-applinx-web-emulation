@@ -14,9 +14,9 @@
  * limitations under the License.
  */ 
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
-import {NavigationService} from './services/navigation/navigation.service';
-import {StorageService} from './services/storage.service';
-import {WebLoginComponent} from './webLogin/webLogin.component';
+import { NavigationService } from './services/navigation/navigation.service';
+import { StorageService } from './services/storage.service';
+import { WebLoginComponent } from './webLogin/webLogin.component';
 import { GridPosition, TabAndArrowsService } from './services/navigation/tab-and-arrows.service';
 import { ScreenLockerService } from './services/screen-locker.service';
 import { KeyboardMappingService } from './services/keyboard-mapping.service';
@@ -30,8 +30,7 @@ import { LifecycleUserExits } from './user-exits/LifecycleUserExits';
 import { UserExitsEventThrowerService } from './services/user-exits-event-thrower.service';
 import { OAuth2HandlerService } from './services/oauth2-handler.service';
 import { MessagesService } from './services/messages.service';
-import { HostKeyTransformation, Cursor, SessionService ,InfoService} from '@softwareag/applinx-rest-apis';
-
+import { HostKeyTransformation, Cursor, SessionService ,InfoService } from '@softwareag/applinx-rest-apis';
 
 @Component({
   selector: 'app-root',
@@ -48,9 +47,12 @@ export class AppComponent implements OnInit, OnDestroy {
   loginComponent: WebLoginComponent;
   displayScreen = false;
   
+  errorMessage: string;
+
   disconnectSubscription: Subscription;
   hostKeysEmitterSubscription: Subscription;
   screenInitializedSubscription: Subscription;
+  hostConnectionSubscription: Subscription;
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
@@ -100,13 +102,12 @@ export class AppComponent implements OnInit, OnDestroy {
     private screenHolderService: ScreenHolderService, private userExitsEventThrower: UserExitsEventThrowerService,
     private logger: NGXLogger, private httpClient: HttpClient, private messages: MessagesService,
     private oAuth2handler: OAuth2HandlerService,
-	private infoService: InfoService) {
+	  private infoService: InfoService) {
     this.userExitsEventThrower.clearEventListeners();
     this.userExitsEventThrower.addEventListener(new LifecycleUserExits(infoService,navigationService,storageService,keyboardMappingService,logger));
     this.getLoggerConfiguration();
   }
-  
-            
+    
 	getLoggerConfiguration() {   
     const jsonDefault: LoggerConfig = this.logger.getConfigSnapshot();
     this.httpClient.get<LoggerConfig>('./assets/config/sessionConfig.json').subscribe(data => {
@@ -132,6 +133,23 @@ export class AppComponent implements OnInit, OnDestroy {
         });
       }
     });
+    this.hostConnectionSubscription = this.navigationService.isConnectedtoHost.subscribe(hostConnection => {
+      if (!hostConnection) {
+        this.errorMessage = this.navigationService.errorMessage;
+        this.showDisconnectionMessage();
+      }
+    })
+  }
+
+  showDisconnectionMessage(): void {
+    const targetModal = document.getElementById('readonly_modal');
+    targetModal.classList.add('dlt-modal-window__open');
+  }
+
+  reconnect(): void {
+    const targetModal = document.getElementById('readonly_modal');
+    targetModal.classList.remove('dlt-modal-window__open')
+    this.storageService.setNotConnected();
   }
 
   reload(): void {
@@ -187,6 +205,9 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     if (this.screenInitializedSubscription) {
       this.screenInitializedSubscription.unsubscribe();
+    }
+    if (this.hostConnectionSubscription) {
+      this.hostConnectionSubscription.unsubscribe();
     }
   }
 }
