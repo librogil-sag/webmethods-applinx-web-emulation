@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */ 
- import {Injectable} from '@angular/core';
+
+import { Injectable } from '@angular/core';
 import { GXUtils } from 'src/utils/GXUtils'
-import {BehaviorSubject, Observable} from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ScreenLockerService } from '../screen-locker.service';
 import { Router } from '@angular/router';
 import { UserExitsEventThrowerService } from '../user-exits-event-thrower.service';
@@ -27,13 +28,15 @@ import { Position, Size, InputField, Cursor, ScreenService, InfoService, SendKey
 import { TabAndArrowsService } from './tab-and-arrows.service';
 import { StatusCodes } from 'http-status-codes';
 import { GetScreenNumberResponse } from '@softwareag/applinx-rest-apis/lib/model/getScreenNumberResponse';
+import { GXConst } from '../enum.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NavigationService {
- 
-  
+  errorMessage: string;
+  isAutoLogin: boolean;
+  authMethod: string;
   private routingHandler: RoutingHandler;
   private screenId: number;
   private screenSize: Size;
@@ -41,9 +44,10 @@ export class NavigationService {
   private cursorPosition: Cursor;
   CHECK_HOST_SCREEN_UPDATE_INTERVAL:number = 5000;
   CHECK_HOST_SCREEN_UPDATE_TIMEOUT:number = 500;
+  isConnectedtoHost: BehaviorSubject<boolean> = new BehaviorSubject(true); // if false - shows disconnection message or redirects to login page
   isScreenUpdated: BehaviorSubject<boolean> = new BehaviorSubject(false);
   screenObjectUpdated: BehaviorSubject<GetScreenResponse> = new BehaviorSubject(null);
-
+  private isThereError: boolean = false; // if true - stops sampling screen every 5 seconds
   constructor(private screenService: ScreenService, 
               private screenLockerService: ScreenLockerService, private router: Router,
               private infoService: InfoService, 
@@ -55,16 +59,23 @@ export class NavigationService {
     this.sendableFields = new Map<string, InputField>();
     this.setRoutingHandler();
     this.checkHostScreenUpdate();
+    this.getAuthMethod();
+  }
+
+  setIsAutoLogin (isAutoLogin:boolean): void {
+    this.isAutoLogin = isAutoLogin;
   }
 
   checkHostScreenUpdate (): void {
     setInterval( () => { 
       this.checkScreenUpdated();
-       
    }, this.CHECK_HOST_SCREEN_UPDATE_INTERVAL);
   }
 
   checkScreenUpdated () {
+    if (this.isThereError) {
+      return;
+    } 
     const req = new GetScreenRequest();                           
     if (this.getScreenId()){
       this.getHostScreenNumber().subscribe (
@@ -74,12 +85,33 @@ export class NavigationService {
           }
         },
         (error: HttpErrorResponse) => {
+          this.errorHandler(error, true);
           this.logger.error(this.messages.get("FAILED_TO_GET_SCREEN_FROM_REST_API"));
           this.userExitsEventThrower.fireOnGetScreenError(error);
         });
     }
   }
 
+  errorHandler(errorResponse: HttpErrorResponse, nonActivityFlow: boolean) {
+    console.log(errorResponse.error.message);
+    if (errorResponse.error.message.indexOf("Disconnected by host") > -1 ||
+      errorResponse.error.message.indexOf("Session was disconnected by Host") > -1 ||
+      errorResponse.error.message.indexOf("Not connected to Server (Software caused connection abort: recv failed)") > -1) {
+        if (nonActivityFlow) {
+          this.errorMessage = 'The session has timed out due to inactivity.';
+          this.isConnectedtoHost.next(false);
+          this.isThereError = true;
+        }
+        else if ((this.isAuthDisabled() && this.isAutoLogin) ) { // show disconnect message                
+          this.errorMessage = 'The session has been disconnected from the host.';          
+          this.isConnectedtoHost.next(false);
+          this.isThereError = true;
+        }
+        else { // redirect to webLogin
+          this.storageService.setNotConnected();
+        }  
+      }
+    }
 
   getHostScreenNumber (): Observable<GetScreenNumberResponse>{         
     return this.screenService.getScreenNumber(this.storageService.getAuthToken());    
@@ -105,7 +137,6 @@ export class NavigationService {
   checkForIntermidateScreen() {
     setTimeout( () => { 
       this.checkScreenUpdated();
-       
      }, this.CHECK_HOST_SCREEN_UPDATE_TIMEOUT);
   }
 
@@ -124,12 +155,20 @@ export class NavigationService {
       
     }, errorResponse => {
       this.logger.error(errorResponse);
-      if (errorResponse.status === StatusCodes.GONE || errorResponse.error.message.indexOf("Session was disconnected by Host") > 0) {
-          this.storageService.setNotConnected();
-      }
+      this.errorHandler(errorResponse, false);
       this.userExitsEventThrower.fireOnSendKeyError(errorResponse);   
       this.screenLockerService.setLocked(false);
     });
+  }
+
+  getAuthMethod(): void {
+    this.infoService.getInfo().subscribe((response: GetInfoResponse) => {
+        this.authMethod = response.auth;
+    });
+  }
+
+  isAuthDisabled (): boolean {
+    return (this.authMethod == GXConst.DISABLED);
   }
 
   /**
@@ -151,7 +190,11 @@ export class NavigationService {
   public getScreenId(): number {
     return this.screenId;
   }
-  
+
+  isThereErrorSetter(status: boolean): void {
+    this.isThereError = status;
+  }
+
   setScreenId(id: number): void {
     this.screenId = id;
     this.screenLockerService.setScreenIdUpdated(true);
@@ -209,6 +252,7 @@ export class NavigationService {
       }
     });
   }
+
   tearDown(): void {
     this.sendableFields.clear();
     this.tabAndArrowsService.tearDown();
