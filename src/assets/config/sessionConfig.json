@@ -1,5 +1,5 @@
 {
-    "applicationName" : "NatuxWindows_offline",
+    "applicationName" : "InstantDemo",
     "connectionPool" : "",
     "autoLoginIfDisabledAuth": false,
     "logger" : {
